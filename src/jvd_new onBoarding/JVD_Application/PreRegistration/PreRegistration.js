@@ -8,13 +8,16 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 
-import LoadingService from '../../../ScholarshipRenewal/Components/Api\'s/LoadingService';
-import { API_URL } from '../../../ScholarshipRenewal/Components/Api\'s/Apis';
+
 import Header from '../../../Header/Header';
 import { useBetween } from 'use-between';
 import useCounter from '../allTags';
 
-import { formikValidations, forrmikInitialValue } from './PreRegistrationValidation';
+
+import LoadingService from '../../../ScholarshipRenewal/Components/Api\'s/LoadingService';
+import { cetforrmikInitialValuess, cstformikValidations } from './PreRegistrationValidation';
+import { API_URL } from '../../../ScholarshipRenewal/Components/Api\'s/Apis';
+
 
 
 function useSharedCounter() { 
@@ -23,83 +26,62 @@ function useSharedCounter() {
 
 
 export default function PreRegistration() {
-  const {cetAdharDetails,setCetAdharDetails,setSscdata,Sscdata} = useSharedCounter();
+  const {cetAdharDetails,setCetAdharDetails,setSscdata,Sscdata,cetTypeData,
+      setCetTypeData,basicScreenDetails,setBAsicScreenDetails,
+      cetCourseNAme, SetcetCourseNAme} = useSharedCounter();
 const navigate=useNavigate();
+const [showData,setData]=useState("")
 
-const [showDistCode,setDistCode]=useState('');
-const [showManList,setManList]=useState([]);
-const [showDistManApi,setDistManApi]=useState({});
-const [showMandalCode,setMandalCode]=useState('');
-const [showVillApi,setVillApi] = useState([]);
-useEffect(()=>{
-  axios.get("http://172.16.150.53:8302/jnbap/apdistman").then(response=>{
-   // alert(JSON.stringify(response.data));
-    setDistManApi(response.data);
-  })
-},[]
-);
+
 
  const formIk = useFormik({
         enableReinitialize:true,
-        initialValues:forrmikInitialValue,
-       validationSchema:formikValidations,
+        initialValues:cetforrmikInitialValuess,
+     //  validationSchema:cstformikValidations,
       
   onSubmit:(values)=>{
-    alert(JSON.stringify(values));    
-            LoadingService.SaveCetData(values).then((res)=>{
-                if(res.data!==null){
-                    alert("Application Submitted Successfully");
-                    console.log("responsed data", res)
-                  navigate("/")
-                   
-                }
-                else{
-                    alert("Failed To Submit ");
-                }
-            })
+    alert("hi")   
+    console.log(values);
+   
+    var answer = window.confirm("Save data?");
+  if (answer) {
+    alert("Are you sure you want to save this?");
+    LoadingService.SaveCetData(values).then((res)=>{
+            alert(JSON.stringify(res.data))
+            // setBAsicScreenDetails(res.data)
+if(res.data.scode==="01"){
+   
+      const msg1 = (
+            <div>
+              <p> Registration Successfully Completed </p><br/>
+
+              <p>  <b style={{color:"red"}} >{res.data.reg_id}</b></p>
+              <p>        <b style={{color:"red"}} >{res.data.temp_password}</b></p>
+             <p> <a href='http://localhost:3000/jvd'>Click here to Go To Student Details Page</a></p>
+              </div>
+          );
+
+          setData(msg1);
+      console.log("responsed data", res.data)
+
+}
+ })
            .catch(()=>{
             alert("Server is too busy plz try again after sometime")
            })
-          
+      }
+      else{
+            alert("cancel");
+      }
         }
-    });
-    useEffect(
-      () => {
         
-        if(showDistCode !== '')
-        {
-          setManList(showDistManApi.APCFSS_Mandals.filter((dVal) => dVal.distCode==showDistCode));
-        }
-      },[showDistCode]
+    }
     );
-    
-    
-    const getVillageDataFunction = async(e)=>
-    {
-      setMandalCode(e.target.value);
-      // alert("mandal code ::::::::" + showMandalCode);
-      let villUrl=(API_URL+"villages/?distCode="+showDistCode+"&&mandalCode="+e.target.value);
-      try{
-      await axios.get(villUrl).then( response => {
-        setVillApi(response.data);
-      
-      })
-      }
-      catch(exception){
-        console.log("exception :::::::"+exception);
-      }
-    }
-    
-    
-    function clearVillagesFunc()
-    {
-      formIk.setFieldValue("stu_village","");
-    }
-    
- function clearMandalsFunc()
-    {
-      formIk.setFieldValue("stu_mandal","");
-    }
+//     alert(JSON.stringify(showData))
+
+
+
+
 
 
 /*********For ssc service */
@@ -113,10 +95,45 @@ function Sscdetails(event) {
 "http://172.16.150.48:8300/JnbOverseas/getsscdata?sscHallticketNo="+sscHtno+"&sscpassyear="+sscPassyr+"&sscpasstype="+event.target.value;
 
   axios.get(regUrl).then((response) => {
-    alert(regUrl);
-    setSscdata(response.data.data);
+
+setSscdata(response.data.data);
   });
 }
+
+
+/*****For cet type */
+function Cetdata(){
+ // let regUrl="http://172.16.150.61:8302/jnbap/"+{collCode}+"/getCetRegistredValues ";
+ let regUrl="http://172.16.150.61:8302/jnbap/12532/getCetRegistredValues";
+ axios.get(regUrl).then((response)=>{
+  console.log("cettype",cetTypeData)
+  setCetTypeData(response.data)
+  
+ })
+
+}
+
+
+/**Cet courses */
+
+
+function CetCourses(){
+      let regUrl="http://172.16.150.61:8302/jnbap/15472/getCollegesRegistration ";
+      axios.get(regUrl).then((response)=>{
+            console.log("courses",response.data)
+       SetcetCourseNAme(response.data)
+       
+      })     
+}
+useEffect(()=>{
+  Cetdata()
+  CetCourses()
+},[])
+
+
+
+
+
 return (
     <div>
              <Header/>
@@ -142,26 +159,28 @@ return (
         </div>
         <div className="form-card-jnb" style={{ marginTop: "5px" }}>
         <jnb.Row className="px-5 pt-5">
-  <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
-                 <jnb.InputGroup className="mb-4p">
-                     <span className="label-text-style"><b>Academic Year</b></span>
-<Field component="select" name="ac_year" className="form-control">
-              <option value="">Select</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
+        <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
+                 <jnb.InputGroup className="mb-4p5">
+                 <span className="label-text-style"><b>CET Course Name</b></span>
+                 <Field component="select" name="cet_course_name" className="form-control">
+                 <option value="">--Select--</option>
+              {cetCourseNAme!== undefined &&
+              cetCourseNAme.map((ds,i)=>{
+                return <option key={i} value={ds.course_name}>{ds.course_name}</option>
+              })}
             </Field>
-                     <ErrorMessage name="ac_year" component="div" className="text-error" />
+                     <ErrorMessage name="cet_course_name" component="div" className="text-error" />
                  </jnb.InputGroup>
            </jnb.Col>
            <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
                  <jnb.InputGroup className="mb-4p5">
                  <span className="label-text-style"><b>CET Type</b></span>
             <Field component="select" name="cet_type" className="form-control">
-              <option value="">Select</option>
-              <option value="1">ICE</option>
-              <option value="2">EAPCET</option>
-              <option value="3">RCET</option>
+            <option value="">--Select--</option>
+              {cetTypeData!== undefined &&
+              cetTypeData.map((ds,i)=>{
+                return <option key={i} value={ds.cet_code}>{ds.cet_code}</option>
+              })}
             </Field>
                      <ErrorMessage name="cet_type" component="div" className="text-error" />
                  </jnb.InputGroup>
@@ -182,18 +201,7 @@ return (
                      <ErrorMessage name="cet_rank" component="div" className="text-error" />
                  </jnb.InputGroup>
            </jnb.Col>
-           <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
-                 <jnb.InputGroup className="mb-4p5">
-                 <span className="label-text-style"><b>CET Course Name</b></span>
-                 <Field component="select" name="cet_course_name" className="form-control">
-              <option value="">Select</option>
-              <option value="1">Agriculture Engineering</option>
-              <option value="2">Civil Engineering</option>
-              <option value="3">Computer Science Engineering</option>
-            </Field>
-                     <ErrorMessage name="cet_course_name" component="div" className="text-error" />
-                 </jnb.InputGroup>
-           </jnb.Col>
+          
          
             
           
@@ -285,9 +293,9 @@ return (
            <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
                  <jnb.InputGroup className="mb-4p5">
                  <span className="label-text-style"><b>Gender&nbsp;</b></span>
-            <Field type="radio" name="gender" value="M"/>
+            <Field type="radio" name="gender" value="Male"/>
             &nbsp;Male  &nbsp;
-            <Field type="radio" name="gender" value="F"/>
+            <Field type="radio" name="gender" value="Female"/>
             &nbsp;Female
             <ErrorMessage name="gender" component="div" className="text-error" />
                  </jnb.InputGroup>
@@ -319,8 +327,8 @@ return (
            <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
                  <jnb.InputGroup className="mb-4p5">
                      <span className="label-text-style"><b>Mobile Number</b></span>
-                     <Field type="text" name="mobileNo" className="form-control"  />
-                     <ErrorMessage name="mobileNo" component="div" className="text-error" />
+                     <Field type="text" name="mobile_no" className="form-control"  />
+                     <ErrorMessage name="mobile_no" component="div" className="text-error" />
                  </jnb.InputGroup>
            </jnb.Col>
            <jnb.Col xs={12} sm={12} md={12} lg={3} xl={3} xxl={3}>
@@ -351,18 +359,22 @@ return (
 </jnb.Row>
 {/* })} */}
 <br/>
- </div>
- <jnb.Row className="p-4">
-            <jnb.Col xs={12} sm={12} md={12} lg={10} xl={10} xxl={10}>&nbsp;</jnb.Col>
+<jnb.Row className="p-4">
+            <jnb.Col xs={12} sm={12} md={12} lg={10} xl={10} xxl={10}><i className="text-danger"> {showData} </i>
+            
+            
+            </jnb.Col>
             <jnb.Col xs={12} sm={12} md={12} lg={2} xl={2} xxl={2}>
             <div className="d-grid">
-            <jnb.Button variant="success" type="submit">
+            <jnb.Button variant="success" type="submit" >
           Submit
         </jnb.Button> 
         </div>
               </jnb.Col>
         
       </jnb.Row>
+ </div>
+
         </jnb.Container>
 
        

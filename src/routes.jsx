@@ -13,6 +13,7 @@ import Dashboard from "./ScholarshipRenewal/Components/Dashboard/Dashboard"
 import RenewalStatistics from "./ScholarshipRenewal/Components/Dashboard/RenewalStastics";
 import LoginPage from "./ScholarshipRenewal/Components/Login/LoginPage";
 import JvdApplication from "./jvd_new onBoarding/JVD_Application/jvdApplication";
+import OnBoardingDashboard from "./jvd_new onBoarding/JVD_Application/Dashboard";
 
 let store = configureStore({
   reducer:{
@@ -39,14 +40,15 @@ const RoutesComponent = () => (
 
      
       
-      <Route path="/" element={<LoginPage></LoginPage>}></Route>
+      <Route path="/login" element={<LoginPage></LoginPage>}></Route>
+
       <Route path="/stuedudtls" element={<StudentEDucationDetails></StudentEDucationDetails>}></Route>
-     
-      <Route path="/stuedu" element={<StudentDetails></StudentDetails>}></Route>
+ <Route path="/stuedu" element={<StudentDetails></StudentDetails>}></Route>
       {/* <Route path="/" element={<PreRegistartion></PreRegistartion>}></Route> */}
-      <Route path="/cetregistration" element={<PreRegistration></PreRegistration>}></Route>
+      <Route path="/" element={<PreRegistration></PreRegistration>}></Route>
       <Route path="/jvd" element={<OnboardingMainPage></OnboardingMainPage>}></Route>
       <Route path="/jvdapplication" element={<JvdApplication></JvdApplication>}></Route>
+    
 
       
 </Routes>

@@ -6,7 +6,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import localStorage from "redux-persist/es/storage";
 import * as jnb from "react-bootstrap";  
 import { BiUser, BiLock } from "react-icons/bi";
-export default function LoginPage() {
+export default function  LoginPage() {
   const [username, setusername] = useState();
   const [image, setImage] = useState();
 
@@ -17,16 +17,14 @@ export default function LoginPage() {
   const navigatetoforgot = () => {
     navigate("/forgotpassword");
   };
-  const userValidationSchema = Yup.object().shape({
-    userId: Yup.string().required("Please enter username"),
-    password: Yup.string().required("Please enter password"),
-  });
+
 
   const submitDetails = async (values) => {
     try {
       const req = values;
       const res = await axios.post(
-        "http://172.16.150.61:9010/jvdlogin/jnblogincheck",
+        // "http://172.16.150.61:9000/jnblogin/jnblogincheck",
+        "http://172.16.150.53:8080/jnbap/jnblogincheck",
         req
       );
     
@@ -36,14 +34,11 @@ export default function LoginPage() {
        if (res.data.responseCode === "01") {
         console.log(res.data)
           alert("Login successfully");
-      localStorage.setItem(
-            "username",
-            JSON.stringify(res.data.studentName)
-          );
-          setusername(res.data.studentName);
-          localStorage.setItem("image", JSON.stringify(res.data.photos));
-          setImage(res.data.photos);
-        //  navigate("/cetregistration");
+      
+          //setusername(res.data.studentName);
+          //localStorage.setItem("image", JSON.stringify(res.data.photos));
+        
+         navigate("/dashboard");
         } else {
           alert(JSON.stringify(res.data.responseDesc));
         }
@@ -55,19 +50,12 @@ export default function LoginPage() {
     }
   };
 
-  useEffect(() => {
-    if (
-      localStorage.getItem("username") === null &&
-      localStorage.getItem("image") == null
-    ) {
-      submitDetails();
-    }
-  }, []);
+
 
   const formIk = useFormik({
     initialValues: {
-      userId: "",
-      userPassword: "",
+      reg_id: "",
+      temp_password: "",
     },
     //validationSchema: userValidationSchema,
     onSubmit: submitDetails,
@@ -105,11 +93,7 @@ export default function LoginPage() {
     <jnb.Container >
     <img src="img/emc.svg" className="corner" alt="dots" />
     <jnb.Row >
-       {/* <jnb.Col xs={12} sm={12} md={12} lg={8} xl={8} xxl={8}>
-       <div className="vertical-center">
-       <img src="../img/slider.svg" width="65%" alt="Jnanabhumi"/>
-       </div>
-      </jnb.Col> */}
+     
       <jnb.Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>&nbsp;</jnb.Col>
       <jnb.Col xs={12} sm={12} md={12} lg={4} xl={4} xxl={4}>
         <div className="login-card ">
@@ -131,12 +115,12 @@ export default function LoginPage() {
                   </jnb.InputGroup.Text>
                   <Field
                 type="text"
-                name="userId"
+                name="reg_id"
                 placeholder="Enter Your User Name"
                 className="form-control" 
               />
                   <ErrorMessage
-                name="userId"
+                name="reg_id"
                 component="div"
                 className="fa fa-exclamation-triangle text-danger"
               />
@@ -146,12 +130,12 @@ export default function LoginPage() {
                   <jnb.InputGroup.Text id="basic-addon2" className="group_txt">
                     <BiLock className="font_size" />
                   </jnb.InputGroup.Text>
-                  <Field placeholder="Password" name="userPassword" type="password"  
+                  <Field placeholder="Password" name="temp_password" type="password"  
                     aria-label="Password"
                     aria-describedby="basic-addon1"
                     className="form-control" autoComplete="off" />
                     <ErrorMessage
-                name="userPassword"
+                name="temp_password"
                 component="div"
                 className="fa fa-exclamation-triangle text-danger"
               />
@@ -161,7 +145,7 @@ export default function LoginPage() {
                   <jnb.Button variant="success" type="submit" className="btn_primary">
                     Sign in
                   </jnb.Button>
-                  {/* <a href="#" className="text-end text-black forgot mb-4" style={{ zIndex: "9994" }} onClick={navigatetoforgot}>Forgot Password ?</a> */}
+                  <a href="#" className="text-end text-black forgot mb-4" style={{ zIndex: "9994" }} onClick={navigatetoforgot}>Forgot Password ?</a>
                 </div>
 
 {/* 
@@ -169,13 +153,13 @@ export default function LoginPage() {
               <label className="control-label star"> Username:</label>
               <Field
                 type="text"
-                name="userId"
+                name="reg_id"
                 placeholder="Enter Your User NAME"
                 className="form-control"
                 class="col-sm-3 col-form-label"
               />
               <ErrorMessage
-                name="userId"
+                name="reg_id"
                 component="div"
                 className="fa fa-exclamation-triangle text-danger"
               />
@@ -199,3 +183,10 @@ export default function LoginPage() {
     </>
   );
 }
+
+
+
+
+
+
+

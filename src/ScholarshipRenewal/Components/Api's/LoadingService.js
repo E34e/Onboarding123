@@ -13,7 +13,7 @@ class LoadingService {
   }
 
   SaveCetData(req){
-  return CommonAxiosPost("http://172.16.150.61:9010/jnbmaster/saveCetDetails", req);
+  return CommonAxiosPost("http://172.16.150.53:8080/jnbap/saveCetDetails", req);
 }
 
 
